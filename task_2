@@ -1,0 +1,89 @@
+const readline = require('readline').createInterface(process.stdin, process.stdout);
+
+let numStr = 1; // номер строки в событии line
+
+// размеры лабиринта
+let n; // высота
+let m; // ширина
+
+const lab = []; // матрица лабиринта
+
+let start; // стартовая точка [x, y]
+let end; // выход - конечная точка [x, y]
+
+readline.on('line', (line) => {
+  if (numStr == 1) {
+    let nm = line.split(' ');
+    n = nm[0];
+    m = nm[1];
+    numStr++;
+  } else if (numStr == 2) {
+    start = line.split(' ');
+    numStr++;
+  } else if (numStr == 3) {
+    end = line.split(' ');
+    numStr++;
+  } else {
+    lab.push(line.split(' '));
+  }
+    
+}).on('close', () => {
+
+  lab[ +start[1] ][ +start[0] ] = 0;
+  let varArr = [ [ +start[0], +start[1] ] ]; // временный массив
+  let arr = []; // вспомогательный
+
+  function mark(square, num) {
+  let x = square[0];
+  let y = square[1];
+
+  // отмечаем снизу, добавляем в массив
+  if (y < n - 1) {
+    if (lab[y + 1][x] === '0') {
+      lab[y + 1][x] = num;
+      arr.push([x, y + 1]);
+    }
+  }
+
+  // отмечаем вверху, добавляем в массив
+  if (y > 0) {
+    if (lab[y - 1][x] === '0') {
+      lab[y - 1][x] = num;
+      arr.push([x, y - 1]);
+    }
+  }
+
+  // отмечаем справа, добавляем в массив
+  if (x < m - 1) {
+    if (lab[y][x + 1] === '0') {
+      lab[y][x + 1] = num;
+      arr.push([x + 1, y]);
+    }
+  }
+
+  // отмечаем слева, добавляем в массив
+  if (x > 0) {
+    if (lab[y][x - 1] === '0') {
+      lab[y][x - 1] = num;
+      arr.push([x - 1, y]);
+    }
+  }
+}
+  
+  let num = 0; // для меток
+  while (varArr.length > 0) {
+    num++;
+    let i2 = varArr.length;
+  
+    for (let i = 0; i < i2; i++) {
+      mark(varArr[i], num);
+    }
+  
+    varArr = arr;
+    arr = [];
+  }
+
+  console.log(lab[ +end[1] ][ +end[0] ]);
+  
+  process.exit(0);
+});
