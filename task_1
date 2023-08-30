@@ -1,0 +1,67 @@
+const readline = require('readline').createInterface(process.stdin, process.stdout);
+
+let numStr = 0; // номер строки
+let n; // кол-во мест
+let m; // кол-во выделенного времени
+
+const c = Array(10001).fill(0); // кол-во мест с ind печенек
+
+readline.on('line', (line) => {
+  if (numStr == 0) {
+    let nm = line.split(' ');
+    n = nm[0];
+    m = nm[1];
+    numStr++;
+  } else {
+    c[line]++;
+  }
+    
+}).on('close', () => {
+  let kMax = 10001; // верхняя граница поиска
+  let kMin = 0; // нижняя
+  let k = median(); // печень в час (скорость жора)
+  let t = time(k); // необходимое время на жор при заданном k
+  let tn; // искомое значение 
+
+  while (kMax - kMin != 1) {
+    if (t <= m) {
+      tn = k;
+
+      kMax = k;
+      k -= median();
+    }
+
+    if (t > m) {
+      kMin = k;
+      k += median();
+    }
+
+    t = time(k);
+  }
+
+  if (t <= m) {
+    tn = k;
+  }
+
+  if (tn && c[0] != n) {
+    console.log(tn);
+  } else {
+    console.log(0);
+  }
+
+  function time(k) {
+    let t = 0;
+
+    for (let i = 1; i <= 10000; i++) {
+      t += Math.ceil(i / k) * c[i];
+    }
+
+    return t;
+  }
+
+  function median() {
+    return Math.ceil( (kMax - kMin) / 2 );
+  }
+  
+  process.exit(0);
+});
